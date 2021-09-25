@@ -25,3 +25,9 @@ output "admin_user" {
   firstname = "Puke"
   lastname = "Stanbra"
 } */
+
+resource "freeipa_user" "jdoe" {
+  username  = "jdoe3977187971214729826"
+  firstname = "John"
+  lastname  = "Doe"
+}

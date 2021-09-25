@@ -35,6 +35,9 @@ func resourceUser() *schema.Resource {
 				Default:  "/bin/bash",
 			},
 		},
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 	}
 }
 

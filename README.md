@@ -110,6 +110,10 @@
   - vaultconfig
   - Vault Containers
 
+# Bugs
+
+- Import not pulling in all attributes
+
 # Development
 
 Getting a FreeIPA container going is an absolute pain on a Mac.
