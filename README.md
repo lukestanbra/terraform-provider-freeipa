@@ -119,12 +119,21 @@
 Getting a FreeIPA container going is an absolute pain on a Mac.
 
 ```
+echo "127.0.0.1 ipa.example.test" >> /etc/hosts
 docker volume create freeipa-data
 docker volume create freeipa-run
 docker run -it --name freeipa-server-container -h ipa.example.test -v /sys/fs/cgroup:/sys/fs/cgroup:ro --mount 'type=volume,src=freeipa-data,dst=/data' --mount 'type=volume,src=freeipa-run,dst=/run' --tmpfs /tmp --sysctl net.ipv6.conf.all.disable_ipv6=0 -p 127.0.0.1:443:443 -p 127.0.0.1:80:80 freeipa/freeipa-server:centos-8-4.9.2
 ```
 
 Go through all the gumph, select all the defaults, and choose a simple password, e.g. password.
+
+Copy the cert off out of the container
+
+```
+docker cp freeipa-server-container:/etc/ipa/ca.crt ./ca.crt
+```
+
+Add it to the mac keychain.
 
 With this container running locally, you can run the example terraform against it. First however, you must build the provider:
 
