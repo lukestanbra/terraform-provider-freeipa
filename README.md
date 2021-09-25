@@ -104,7 +104,7 @@
   - Trusts
   - Global Trust Configuration
   - Trusted domains
-  - Users
+  - ~~Users~~
   - Entry
   - Vaults
   - vaultconfig
