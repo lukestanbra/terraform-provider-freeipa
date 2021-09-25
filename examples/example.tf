@@ -9,7 +9,7 @@ terraform {
 provider "freeipa" {
   username = "admin"
   password = "password"
-  host = "ipa.example.test"
+  host     = "ipa.example.test"
 }
 
 data "freeipa_user" "admin" {
