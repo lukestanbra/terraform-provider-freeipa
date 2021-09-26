@@ -21,7 +21,24 @@ description: |-
 
 ### Optional
 
+- **city** (String)
+- **displayname** (String)
+- **fullname** (String)
+- **gecos** (String)
+- **gid** (Number)
+- **homedirectory** (String)
 - **id** (String) The ID of this resource.
+- **initials** (String)
+- **krbcanonicalname** (String)
+- **krbprincipalname** (List of String)
+- **mobilenumber** (List of String)
+- **pager** (List of String)
+- **postcode** (String)
+- **shell** (String)
+- **state** (String)
+- **street** (String)
+- **telephonenumber** (List of String)
+- **uid** (Number)
 
 ### Read-Only
 

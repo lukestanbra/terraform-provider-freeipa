@@ -23,6 +23,8 @@ description: |-
 
 ### Optional
 
+- **fullname** (String)
+- **homedirectory** (String)
 - **id** (String) The ID of this resource.
 - **shell** (String)
 

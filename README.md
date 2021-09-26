@@ -1,8 +1,8 @@
 # To do
 
-- Makefile
+- ~~Makefile~~
 - Terratest
-- Documentation via tfplugindocs
+- ~~Documentation via tfplugindocs~~
 - CHANGELOG.md
 - goreleaser?
 - LICENSE
@@ -113,6 +113,18 @@
 # Bugs
 
 - ~~Import not pulling in all attributes~~
+- Datetime variables do not work properly
+  - At some point in the last couple years, the FreeIPA API started returning Datetime
+  variables like so:
+  ```
+  "krbpasswordexpiration": [
+    {
+      "__datetime__": "20210926115531Z"
+    }
+  ]
+  ```
+  The go-freeipa library assumed that it could cast this to a `time.Time`, however this doesn't work. Current workaround is that I've edited the vendored package with a regenerated version of the freeipa client code so that these are just `interface{}`. I'm also thinking I can mostly avoid ever having to use Datetime fields as these won't ever be set declaratively.
+
 
 # Development
 

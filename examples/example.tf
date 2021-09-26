@@ -26,3 +26,9 @@ resource "freeipa_user" "jdoe" {
   lastname  = "Doe"
   shell     = "/bin/bash"
 }
+
+resource "freeipa_user" "lukestanbra" {
+  username  = "lukestanbra"
+  firstname = "Luke"
+  lastname  = "Stanbra"
+}

@@ -6,8 +6,29 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/mitchellh/mapstructure"
 	ipa "github.com/tehwalris/go-freeipa/freeipa"
 )
+
+// UserShowResult{
+// 	"result":{
+// 		"uid":"jdoe4733520369981736867",
+// 		"givenname":"John",
+// 		"sn":"Doe",
+// 		"homedirectory":"/home/jdoe4733520369981736867",
+// 		"loginshell":"/bin/sh",
+// 		"krbcanonicalname":"jdoe4733520369981736867@EXAMPLE.TEST",
+// 		"krbprincipalname":["jdoe4733520369981736867@EXAMPLE.TEST"],
+// 		"mail":["jdoe4733520369981736867@example.test"],
+// 		"uidnumber":1237800001,
+// 		"gidnumber":1237800001,
+// 		"nsaccountlock":false,
+// 		"has_password":false,
+// 		"memberof_group":["ipausers"],
+// 		"has_keytab":false
+// 	},
+// 	"value":"jdoe4733520369981736867"
+// }
 
 func resourceUser() *schema.Resource {
 	return &schema.Resource{
@@ -29,6 +50,16 @@ func resourceUser() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
+			"fullname": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"homedirectory": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
 			"shell": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -47,22 +78,38 @@ func resourceUserCreate(ctx context.Context, d *schema.ResourceData, m interface
 
 	c := m.(*ipa.Client)
 
+	var userAddArgs ipa.UserAddArgs
+	userAddArgsMap := make(map[string]interface{})
+	userAddArgsMap["givenname"] = d.Get("firstname")
+	userAddArgsMap["sn"] = d.Get("lastname")
+
+	mapstructure.Decode(userAddArgsMap, &userAddArgs)
+
+	log.Printf("%s", userAddArgsMap)
+	log.Printf("%s", userAddArgs)
+
+	var userAddOptionalArgs ipa.UserAddOptionalArgs
+	userAddOptionalArgsMap := make(map[string]interface{})
+	userAddOptionalArgsMap["uid"] = d.Get("username")
+	userAddOptionalArgsMap["loginshell"] = d.Get("shell")
+	userAddOptionalArgsMap["all"] = true
+
+	if val, ok := d.GetOk("homedirectory"); ok {
+		userAddOptionalArgsMap["homedirectory"] = val
+	}
+
+	mapstructure.Decode(userAddOptionalArgsMap, &userAddOptionalArgs)
+
 	_, err := c.UserAdd(
-		&ipa.UserAddArgs{
-			Givenname: *ipa.String(d.Get("firstname").(string)),
-			Sn:        *ipa.String(d.Get("lastname").(string)),
-		},
-		&ipa.UserAddOptionalArgs{
-			UID:        ipa.String(d.Get("username").(string)),
-			Loginshell: ipa.String(d.Get("shell").(string)),
-		},
+		&userAddArgs,
+		&userAddOptionalArgs,
 	)
 
 	if err != nil {
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Unable to create FreeIPA user",
-			Detail:   "Unable to create FreeIPA user",
+			Detail:   err.Error(),
 		})
 	}
 
@@ -111,6 +158,10 @@ func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}
 		return diag.FromErr(err)
 	}
 
+	if err := d.Set("homedirectory", r.Result.Homedirectory); err != nil {
+		return diag.FromErr(err)
+	}
+
 	return diags
 }
 
@@ -120,15 +171,23 @@ func resourceUserUpdate(ctx context.Context, d *schema.ResourceData, m interface
 		"firstname",
 		"lastname",
 		"shell",
+		"homedirectory",
 	) {
+		var userModOptionalArgs ipa.UserModOptionalArgs
+		userModOptionalArgsMap := make(map[string]interface{})
+		userModOptionalArgsMap["uid"] = d.Id()
+		userModOptionalArgsMap["firstname"] = d.Get("firstname")
+		userModOptionalArgsMap["lastname"] = d.Get("lastname")
+		userModOptionalArgsMap["shell"] = d.Get("shell")
+		userModOptionalArgsMap["all"] = true
+		if val, ok := d.GetOk("homedirectory"); ok {
+			log.Printf("============= GOT HOMEDIRECTORY OK ===============")
+			userModOptionalArgsMap["homedirectory"] = val
+		}
+		mapstructure.Decode(userModOptionalArgsMap, &userModOptionalArgs)
 		r, err := c.UserMod(
 			&ipa.UserModArgs{},
-			&ipa.UserModOptionalArgs{
-				UID:        ipa.String(d.Id()),
-				Givenname:  ipa.String(d.Get("firstname").(string)),
-				Sn:         ipa.String(d.Get("lastname").(string)),
-				Loginshell: ipa.String(d.Get("shell").(string)),
-			},
+			&userModOptionalArgs,
 		)
 		log.Printf("%s", r)
 		if err != nil {
