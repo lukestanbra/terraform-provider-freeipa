@@ -17,15 +17,34 @@ description: |-
 
 ### Required
 
-- **firstname** (String)
-- **lastname** (String)
+- **first_name** (String)
+- **last_name** (String)
 - **username** (String)
 
 ### Optional
 
-- **fullname** (String)
-- **homedirectory** (String)
+- **car_license** (List of String)
+- **city** (String)
+- **display_name** (String)
+- **email** (List of String)
+- **fax_number** (List of String)
+- **full_name** (String)
+- **gecos** (String)
+- **gid** (Number)
+- **home_directory** (String)
 - **id** (String) The ID of this resource.
+- **initials** (String)
+- **job_title** (String)
+- **krb_principal_name** (List of String)
+- **manager** (String)
+- **mobile_number** (List of String)
+- **organisational_unit** (String)
+- **pager** (List of String)
+- **postcode** (String)
 - **shell** (String)
+- **state** (String)
+- **street** (String)
+- **telephone_number** (List of String)
+- **uid** (Number)
 
 

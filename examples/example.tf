@@ -21,14 +21,14 @@ output "jdoe_user" {
 }
 
 resource "freeipa_user" "jdoe" {
-  username  = "jdoe3977187971214729826"
+  username   = "jdoe3977187971214729826"
   first_name = "John"
   last_name  = "Doe"
-  shell     = "/bin/bash"
+  shell      = "/bin/bash"
 }
 
 resource "freeipa_user" "lukestanbra" {
-  username  = "lukestanbra"
+  username   = "lukestanbra"
   first_name = "Luke"
   last_name  = "Stanbra"
   job_title  = "DevOps"
