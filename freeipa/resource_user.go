@@ -2,33 +2,12 @@ package freeipa
 
 import (
 	"context"
-	"log"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	ipa "github.com/lukestanbra/go-freeipa/freeipa"
 	"github.com/mitchellh/mapstructure"
 )
-
-// UserShowResult{
-// 	"result":{
-// 		"uid":"jdoe4733520369981736867",
-// 		"givenname":"John",
-// 		"sn":"Doe",
-// 		"homedirectory":"/home/jdoe4733520369981736867",
-// 		"loginshell":"/bin/sh",
-// 		"krbcanonicalname":"jdoe4733520369981736867@EXAMPLE.TEST",
-// 		"krbprincipalname":["jdoe4733520369981736867@EXAMPLE.TEST"],
-// 		"mail":["jdoe4733520369981736867@example.test"],
-// 		"uidnumber":1237800001,
-// 		"gidnumber":1237800001,
-// 		"nsaccountlock":false,
-// 		"has_password":false,
-// 		"memberof_group":["ipausers"],
-// 		"has_keytab":false
-// 	},
-// 	"value":"jdoe4733520369981736867"
-// }
 
 func resourceUser() *schema.Resource {
 	return &schema.Resource{
@@ -42,20 +21,35 @@ func resourceUser() *schema.Resource {
 				Required: true,
 				ForceNew: true,
 			},
-			"firstname": &schema.Schema{
+			"first_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"lastname": &schema.Schema{
+			"last_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"fullname": &schema.Schema{
+			"full_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"homedirectory": &schema.Schema{
+			"display_name": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"initials": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"home_directory": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"gecos": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -63,7 +57,96 @@ func resourceUser() *schema.Resource {
 			"shell": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
-				Default:  "/bin/sh",
+				Computed: true,
+			},
+			"krb_principal_name": &schema.Schema{
+				Type:     schema.TypeList,
+				Optional: true,
+				Computed: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+			"email": &schema.Schema{
+				Type:     schema.TypeList,
+				Optional: true,
+				Computed: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+			"uid": &schema.Schema{
+				Type:     schema.TypeInt,
+				Optional: true,
+				Computed: true,
+			},
+			"gid": &schema.Schema{
+				Type:     schema.TypeInt,
+				Optional: true,
+				Computed: true,
+			},
+			"street": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"city": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"state": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"postcode": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"telephone_number": &schema.Schema{
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+			"mobile_number": &schema.Schema{
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+			"pager": &schema.Schema{
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+			"fax_number": &schema.Schema{
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+			"organisational_unit": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"job_title": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"manager": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"car_license": &schema.Schema{
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
 			},
 		},
 		Importer: &schema.ResourceImporter{
@@ -80,22 +163,46 @@ func resourceUserCreate(ctx context.Context, d *schema.ResourceData, m interface
 
 	var userAddArgs ipa.UserAddArgs
 	userAddArgsMap := make(map[string]interface{})
-	userAddArgsMap["givenname"] = d.Get("firstname")
-	userAddArgsMap["sn"] = d.Get("lastname")
+	userAddArgsMap["givenname"] = d.Get("first_name")
+	userAddArgsMap["sn"] = d.Get("last_name")
 
 	mapstructure.Decode(userAddArgsMap, &userAddArgs)
-
-	log.Printf("%s", userAddArgsMap)
-	log.Printf("%s", userAddArgs)
 
 	var userAddOptionalArgs ipa.UserAddOptionalArgs
 	userAddOptionalArgsMap := make(map[string]interface{})
 	userAddOptionalArgsMap["uid"] = d.Get("username")
-	userAddOptionalArgsMap["loginshell"] = d.Get("shell")
 	userAddOptionalArgsMap["all"] = true
 
-	if val, ok := d.GetOk("homedirectory"); ok {
-		userAddOptionalArgsMap["homedirectory"] = val
+	// Maps terraform resource variable names to FreeIPA Client names
+	userAddOptionalVarsMap := map[string]string{
+		"full_name":           "cn",
+		"display_name":        "displayname",
+		"initials":            "initials",
+		"home_directory":      "homedirectory",
+		"gecos":               "gecos",
+		"shell":               "loginshell",
+		"krb_principal_name":  "krbprincipalname",
+		"email":               "mail",
+		"uid":                 "uidnumber",
+		"gid":                 "gidnumber",
+		"street":              "street",
+		"city":                "l",
+		"state":               "st",
+		"postcode":            "postalcode",
+		"telephone_number":    "telephonenumber",
+		"mobile_number":       "mobile",
+		"pager":               "pager",
+		"fax_number":          "facsimiletelephonenumber",
+		"organisational_unit": "ou",
+		"job_title":           "title",
+		"manager":             "manager",
+		"car_license":         "carlicense",
+	}
+
+	for k, v := range userAddOptionalVarsMap {
+		if val, ok := d.GetOk(k); ok {
+			userAddOptionalArgsMap[v] = val
+		}
 	}
 
 	mapstructure.Decode(userAddOptionalArgsMap, &userAddOptionalArgs)
@@ -132,6 +239,7 @@ func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}
 		&ipa.UserShowArgs{},
 		&ipa.UserShowOptionalArgs{
 			UID: ipa.String(user_id),
+			All: ipa.Bool(true),
 		},
 	)
 
@@ -139,27 +247,35 @@ func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}
 		return diag.FromErr(err)
 	}
 
-	if err := d.Set("username", r.Result.UID); err != nil {
-		return diag.FromErr(err)
+	userShowResultsVarsMap := map[string]interface{}{
+		"first_name":          r.Result.Givenname,
+		"last_name":           r.Result.Sn,
+		"full_name":           r.Result.Cn,
+		"display_name":        r.Result.Displayname,
+		"initials":            r.Result.Initials,
+		"home_directory":      r.Result.Homedirectory,
+		"gecos":               r.Result.Gecos,
+		"shell":               r.Result.Loginshell,
+		"krb_principal_name":  r.Result.Krbprincipalname,
+		"email":               r.Result.Mail,
+		"uid":                 r.Result.Uidnumber,
+		"gid":                 r.Result.Gidnumber,
+		"street":              r.Result.Street,
+		"city":                r.Result.L,
+		"state":               r.Result.St,
+		"postcode":            r.Result.Postalcode,
+		"telephone_number":    r.Result.Telephonenumber,
+		"mobile_number":       r.Result.Mobile,
+		"pager":               r.Result.Pager,
+		"faxnumber":           r.Result.Facsimiletelephonenumber,
+		"organisational_unit": r.Result.Ou,
+		"job_title":           r.Result.Title,
+		"manager":             r.Result.Manager,
+		"car_license":         r.Result.Carlicense,
 	}
 
-	// Givenname should be required, however the admin user doesn't have one >:(
-	if r.Result.Givenname == nil {
-		d.Set("firstname", "")
-	} else if err := d.Set("firstname", *r.Result.Givenname); err != nil {
-		return diag.FromErr(err)
-	}
-
-	if err := d.Set("lastname", r.Result.Sn); err != nil {
-		return diag.FromErr(err)
-	}
-
-	if err := d.Set("shell", r.Result.Loginshell); err != nil {
-		return diag.FromErr(err)
-	}
-
-	if err := d.Set("homedirectory", r.Result.Homedirectory); err != nil {
-		return diag.FromErr(err)
+	for k, v := range userShowResultsVarsMap {
+		d.Set(k, v)
 	}
 
 	return diags
@@ -167,29 +283,62 @@ func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}
 
 func resourceUserUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*ipa.Client)
-	if d.HasChanges(
-		"firstname",
-		"lastname",
-		"shell",
-		"homedirectory",
-	) {
+
+	// Maps terraform resource variable names to FreeIPA Client names
+	userModOptionalVarsMap := map[string]string{
+		"first_name":          "givenname",
+		"last_name":           "sn",
+		"full_name":           "cn",
+		"display_name":        "displayname",
+		"initials":            "initials",
+		"home_directory":      "homedirectory",
+		"gecos":               "gecos",
+		"shell":               "loginshell",
+		"krb_principal_name":  "krbprincipalname",
+		"email":               "mail",
+		"uid":                 "uidnumber",
+		"gid":                 "gidnumber",
+		"street":              "street",
+		"city":                "l",
+		"state":               "st",
+		"postcode":            "postalcode",
+		"telephone_number":    "telephonenumber",
+		"mobile_number":       "mobile",
+		"pager":               "pager",
+		"fax_number":          "facsimiletelephonenumber",
+		"organisational_unit": "ou",
+		"job_title":           "title",
+		"manager":             "manager",
+		"car_license":         "carlicense",
+	}
+
+	// Extract the keys from the map above
+	keys := make([]string, len(userModOptionalVarsMap))
+	i := 0
+	for k := range userModOptionalVarsMap {
+		keys[i] = k
+		i++
+	}
+
+	if d.HasChanges(keys...) {
 		var userModOptionalArgs ipa.UserModOptionalArgs
 		userModOptionalArgsMap := make(map[string]interface{})
 		userModOptionalArgsMap["uid"] = d.Id()
-		userModOptionalArgsMap["firstname"] = d.Get("firstname")
-		userModOptionalArgsMap["lastname"] = d.Get("lastname")
-		userModOptionalArgsMap["shell"] = d.Get("shell")
 		userModOptionalArgsMap["all"] = true
-		if val, ok := d.GetOk("homedirectory"); ok {
-			log.Printf("============= GOT HOMEDIRECTORY OK ===============")
-			userModOptionalArgsMap["homedirectory"] = val
+
+		for k, v := range userModOptionalVarsMap {
+			if val, ok := d.GetOk(k); ok {
+				userModOptionalArgsMap[v] = val
+			}
 		}
+
 		mapstructure.Decode(userModOptionalArgsMap, &userModOptionalArgs)
-		r, err := c.UserMod(
+
+		_, err := c.UserMod(
 			&ipa.UserModArgs{},
 			&userModOptionalArgs,
 		)
-		log.Printf("%s", r)
+
 		if err != nil {
 			return diag.FromErr(err)
 		}

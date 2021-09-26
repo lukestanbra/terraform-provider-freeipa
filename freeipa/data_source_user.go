@@ -16,20 +16,20 @@ func dataSourceUser() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"firstname": &schema.Schema{
+			"first_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"lastname": &schema.Schema{
+			"last_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"fullname": &schema.Schema{
+			"full_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 				Optional: true,
 			},
-			"displayname": &schema.Schema{
+			"display_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 				Optional: true,
@@ -39,7 +39,7 @@ func dataSourceUser() *schema.Resource {
 				Computed: true,
 				Optional: true,
 			},
-			"homedirectory": &schema.Schema{
+			"home_directory": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 				Optional: true,
@@ -54,12 +54,20 @@ func dataSourceUser() *schema.Resource {
 				Computed: true,
 				Optional: true,
 			},
-			"krbcanonicalname": &schema.Schema{
+			"krb_canonical_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Computed: true,
 				Optional: true,
 			},
-			"krbprincipalname": &schema.Schema{
+			"krb_principal_name": &schema.Schema{
+				Type:     schema.TypeList,
+				Computed: true,
+				Optional: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+			"email": &schema.Schema{
 				Type:     schema.TypeList,
 				Computed: true,
 				Optional: true,
@@ -97,7 +105,7 @@ func dataSourceUser() *schema.Resource {
 				Computed: true,
 				Optional: true,
 			},
-			"telephonenumber": &schema.Schema{
+			"telephone_number": &schema.Schema{
 				Type:     schema.TypeList,
 				Computed: true,
 				Optional: true,
@@ -105,7 +113,7 @@ func dataSourceUser() *schema.Resource {
 					Type: schema.TypeString,
 				},
 			},
-			"mobilenumber": &schema.Schema{
+			"mobile_number": &schema.Schema{
 				Type:     schema.TypeList,
 				Computed: true,
 				Optional: true,
@@ -120,6 +128,107 @@ func dataSourceUser() *schema.Resource {
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+			},
+			"fax_number": &schema.Schema{
+				Type:     schema.TypeList,
+				Computed: true,
+				Optional: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+			"organisational_unit": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+				Optional: true,
+			},
+			"job_title": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+				Optional: true,
+			},
+			"manager": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+				Optional: true,
+			},
+			"car_license": &schema.Schema{
+				Type:     schema.TypeList,
+				Computed: true,
+				Optional: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+			"ssh_public_key": &schema.Schema{
+				Type:     schema.TypeList,
+				Computed: true,
+				Optional: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+			"ssh_public_key_fingerprint": &schema.Schema{
+				Type:     schema.TypeList,
+				Computed: true,
+				Optional: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+			"user_auth_type": &schema.Schema{
+				Type:     schema.TypeList,
+				Computed: true,
+				Optional: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+			"user_class": &schema.Schema{
+				Type:     schema.TypeList,
+				Computed: true,
+				Optional: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+			"token_radius_config_link": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+				Optional: true,
+			},
+			"token_radius_username": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+				Optional: true,
+			},
+			"department_number": &schema.Schema{
+				Type:     schema.TypeList,
+				Computed: true,
+				Optional: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+			"employee_number": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+				Optional: true,
+			},
+			"employee_type": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+				Optional: true,
+			},
+			"preferred_language": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+				Optional: true,
+			},
+			"has_password": &schema.Schema{
+				Type:     schema.TypeBool,
+				Computed: true,
+				Optional: true,
 			},
 		},
 	}
@@ -146,25 +255,42 @@ func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, m interface
 	}
 
 	userResultsVarsMap := map[string]interface{}{
-		"firstname":        r.Result.Givenname,
-		"lastname":         r.Result.Sn,
-		"fullname":         r.Result.Cn,
-		"displayname":      r.Result.Displayname,
-		"initials":         r.Result.Initials,
-		"homedirectory":    r.Result.Homedirectory,
-		"gecos":            r.Result.Gecos,
-		"shell":            r.Result.Loginshell,
-		"krbcanonicalname": r.Result.Krbcanonicalname,
-		"krbprincipalname": r.Result.Krbprincipalname,
-		"uid":              r.Result.Uidnumber,
-		"gid":              r.Result.Gidnumber,
-		"street":           r.Result.Street,
-		"city":             r.Result.L,
-		"state":            r.Result.St,
-		"postcode":         r.Result.Postalcode,
-		"telephonenumber":  r.Result.Telephonenumber,
-		"mobilenumber":     r.Result.Mobile,
-		"pager":            r.Result.Pager,
+		"first_name":                 r.Result.Givenname,
+		"last_name":                  r.Result.Sn,
+		"full_name":                  r.Result.Cn,
+		"display_name":               r.Result.Displayname,
+		"initials":                   r.Result.Initials,
+		"home_directory":             r.Result.Homedirectory,
+		"gecos":                      r.Result.Gecos,
+		"shell":                      r.Result.Loginshell,
+		"krb_canonical_name":         r.Result.Krbcanonicalname,
+		"krb_principal_name":         r.Result.Krbprincipalname,
+		"email":                      r.Result.Mail,
+		"uid":                        r.Result.Uidnumber,
+		"gid":                        r.Result.Gidnumber,
+		"street":                     r.Result.Street,
+		"city":                       r.Result.L,
+		"state":                      r.Result.St,
+		"postcode":                   r.Result.Postalcode,
+		"telephone_number":           r.Result.Telephonenumber,
+		"mobile_number":              r.Result.Mobile,
+		"pager":                      r.Result.Pager,
+		"fax_number":                 r.Result.Facsimiletelephonenumber,
+		"organisational_unit":        r.Result.Ou,
+		"job_title":                  r.Result.Title,
+		"manager":                    r.Result.Manager,
+		"car_license":                r.Result.Carlicense,
+		"ssh_public_key":             r.Result.Ipasshpubkey,
+		"ssh_public_key_fingerprint": r.Result.Sshpubkeyfp,
+		"user_auth_type":             r.Result.Ipauserauthtype,
+		"user_class":                 r.Result.Userclass,
+		"token_radius_config_link":   r.Result.Ipatokenradiusconfiglink,
+		"token_radius_username":      r.Result.Ipatokenradiususername,
+		"department_number":          r.Result.Departmentnumber,
+		"employee_number":            r.Result.Employeenumber,
+		"employee_type":              r.Result.Employeetype,
+		"preferredl_anguage":         r.Result.Preferredlanguage,
+		"has_password":               r.Result.HasPassword,
 	}
 
 	for k, v := range userResultsVarsMap {
