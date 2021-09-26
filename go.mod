@@ -5,8 +5,8 @@ go 1.17
 require (
 	github.com/hashicorp/terraform-plugin-docs v0.5.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.8.0
+	github.com/lukestanbra/go-freeipa v0.0.0-20210926184920-2f31ab9db3dc
 	github.com/mitchellh/mapstructure v1.4.2
-	github.com/tehwalris/go-freeipa v0.0.0-20200322083409-e462fc554b76
 )
 
 require (
@@ -59,6 +59,7 @@ require (
 	github.com/oklog/run v1.0.0 // indirect
 	github.com/posener/complete v1.2.1 // indirect
 	github.com/russross/blackfriday v1.6.0 // indirect
+	github.com/tehwalris/go-freeipa v0.0.0-20200322083409-e462fc554b76 // indirect
 	github.com/ulikunitz/xz v0.5.8 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	github.com/zclconf/go-cty v1.9.1 // indirect

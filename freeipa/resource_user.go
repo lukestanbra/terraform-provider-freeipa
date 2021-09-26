@@ -6,8 +6,8 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	ipa "github.com/lukestanbra/go-freeipa/freeipa"
 	"github.com/mitchellh/mapstructure"
-	ipa "github.com/tehwalris/go-freeipa/freeipa"
 )
 
 // UserShowResult{

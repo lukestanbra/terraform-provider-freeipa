@@ -123,7 +123,7 @@
     }
   ]
   ```
-  The go-freeipa library assumed that it could cast this to a `time.Time`, however this doesn't work. Current workaround is that I've edited the vendored package with a regenerated version of the freeipa client code so that these are just `interface{}`. I'm also thinking I can mostly avoid ever having to use Datetime fields as these won't ever be set declaratively.
+  The go-freeipa library assumed that it could cast this to a `time.Time`, however this doesn't work. Current workaround is that I've edited the package with a regenerated version of the freeipa client code so that these are just `interface{}`. I'm also thinking I can mostly avoid ever having to use Datetime fields as these won't ever be set declaratively. For this reason I've forked the go-freeipa repo with these changes in.
 
 
 # Development
