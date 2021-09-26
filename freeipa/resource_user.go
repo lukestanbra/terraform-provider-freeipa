@@ -32,7 +32,7 @@ func resourceUser() *schema.Resource {
 			"shell": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
-				Default:  "/bin/bash",
+				Default:  "/bin/sh",
 			},
 		},
 		Importer: &schema.ResourceImporter{
@@ -92,6 +92,10 @@ func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}
 		return diag.FromErr(err)
 	}
 
+	if err := d.Set("username", r.Result.UID); err != nil {
+		return diag.FromErr(err)
+	}
+
 	// Givenname should be required, however the admin user doesn't have one >:(
 	if r.Result.Givenname == nil {
 		d.Set("firstname", "")
@@ -100,6 +104,10 @@ func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}
 	}
 
 	if err := d.Set("lastname", r.Result.Sn); err != nil {
+		return diag.FromErr(err)
+	}
+
+	if err := d.Set("shell", r.Result.Loginshell); err != nil {
 		return diag.FromErr(err)
 	}
 

@@ -2,6 +2,7 @@ package freeipa
 
 import (
 	"context"
+	"log"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -46,6 +47,8 @@ func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, m interface
 	if err != nil {
 		return diag.FromErr(err)
 	}
+
+	log.Printf("%s", r)
 
 	// Givenname should be required, however the admin user doesn't have one >:(
 	if r.Result.Givenname == nil {

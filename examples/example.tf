@@ -12,22 +12,17 @@ provider "freeipa" {
   host     = "ipa.example.test"
 }
 
-data "freeipa_user" "admin" {
-  username = "admin"
+data "freeipa_user" "jdoe" {
+  username = "jdoe4733520369981736867"
 }
 
-output "admin_user" {
-  value = data.freeipa_user.admin
+output "jdoe_user" {
+  value = data.freeipa_user.jdoe
 }
-
-/* resource "freeipa_user" "lukestanbra" {
-  username = "lukestanbra"
-  firstname = "Puke"
-  lastname = "Stanbra"
-} */
 
 resource "freeipa_user" "jdoe" {
   username  = "jdoe3977187971214729826"
   firstname = "John"
   lastname  = "Doe"
+  shell     = "/bin/bash"
 }

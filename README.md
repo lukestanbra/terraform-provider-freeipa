@@ -112,7 +112,7 @@
 
 # Bugs
 
-- Import not pulling in all attributes
+- ~~Import not pulling in all attributes~~
 
 # Development
 
