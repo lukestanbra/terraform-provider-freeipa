@@ -30,17 +30,20 @@ func Provider(version string) func() *schema.Provider {
 		p := &schema.Provider{
 			Schema: map[string]*schema.Schema{
 				"host": &schema.Schema{
-					Type:     schema.TypeString,
-					Required: true,
+					Type:        schema.TypeString,
+					Required:    true,
+					DefaultFunc: schema.EnvDefaultFunc("FREEIPA_HOST", nil),
 				},
 				"username": &schema.Schema{
-					Type:     schema.TypeString,
-					Required: true,
+					Type:        schema.TypeString,
+					Required:    true,
+					DefaultFunc: schema.EnvDefaultFunc("FREEIPA_USERNAME", nil),
 				},
 				"password": &schema.Schema{
-					Type:      schema.TypeString,
-					Required:  true,
-					Sensitive: true,
+					Type:        schema.TypeString,
+					Required:    true,
+					Sensitive:   true,
+					DefaultFunc: schema.EnvDefaultFunc("FREEIPA_PASSWORD", nil),
 				},
 			},
 			DataSourcesMap: map[string]*schema.Resource{

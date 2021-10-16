@@ -267,7 +267,7 @@ func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}
 		"telephone_number":    r.Result.Telephonenumber,
 		"mobile_number":       r.Result.Mobile,
 		"pager":               r.Result.Pager,
-		"faxnumber":           r.Result.Facsimiletelephonenumber,
+		"fax_number":          r.Result.Facsimiletelephonenumber,
 		"organisational_unit": r.Result.Ou,
 		"job_title":           r.Result.Title,
 		"manager":             r.Result.Manager,

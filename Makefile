@@ -6,6 +6,12 @@ BINARY=terraform-provider-${NAME}
 VERSION=0.0.1
 OS_ARCH=darwin_amd64
 
+.EXPORT_ALL_VARIABLES:
+
+export FREEIPA_HOST=ipa.example.test
+export FREEIPA_USERNAME=admin
+export FREEIPA_PASSWORD=password
+
 default: install
 
 build:
