@@ -11,7 +11,7 @@ provider "freeipa" {
   password = "password"
   host     = "ipa.example.test"
 }
-
+/* 
 data "freeipa_user" "jdoe" {
   username = "jdoe4733520369981736867"
 }
@@ -19,6 +19,7 @@ data "freeipa_user" "jdoe" {
 output "jdoe_user" {
   value = data.freeipa_user.jdoe
 }
+*/
 
 resource "freeipa_user" "jdoe" {
   username   = "jdoe3977187971214729826"

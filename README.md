@@ -131,49 +131,36 @@
 Getting a FreeIPA container going is an absolute pain on a Mac.
 
 ```
-echo "127.0.0.1 ipa.example.test" >> /etc/hosts
-docker volume create freeipa-data
-docker volume create freeipa-run
-docker run -it --name freeipa-server-container -h ipa.example.test -v /sys/fs/cgroup:/sys/fs/cgroup:ro --mount 'type=volume,src=freeipa-data,dst=/data' --mount 'type=volume,src=freeipa-run,dst=/run' --tmpfs /tmp --sysctl net.ipv6.conf.all.disable_ipv6=0 -p 127.0.0.1:443:443 -p 127.0.0.1:80:80 freeipa/freeipa-server:centos-8-4.9.2
+make container
 ```
 
-Go through all the gumph, select all the defaults, and choose a simple password, e.g. password.
+This sets up FreeIPA with the user `admin` and password `password`. You can connect to it using the UI at https://ipa.example.test.
 
-Copy the cert off out of the container
+Copy the cert off out of the container and add it to the mac keychain.
 
 ```
-docker cp freeipa-server-container:/etc/ipa/ca.crt ./ca.crt
+make certificate
 ```
-
-Add it to the mac keychain.
 
 With this container running locally, you can run the example terraform against it. First however, you must build the provider:
 
 ```
-go get
-go mod tidy
-go mod vendor
-go build -o ~/.terraform.d/plugins/hashicorp.com/lukestanbra/freeipa/0.0.1/darwin_amd64/terraform-provider-freeipa
+make install
 ```
 
 To run the example:
 
 ```
-pushd examples
-terraform init
-terraform apply
-popd
+make example
 ```
 
 If you update the provider code, you'll need to do the following for the core loop:
 
 ```
-rm -rf examples/.terraform*
-go build -o ~/.terraform.d/plugins/hashicorp.com/lukestanbra/freeipa/0.0.1/darwin_amd64/terraform-provider-freeipa
-pushd examples
-terraform init
-terraform apply
-popd
+make test
+make testacc
+make install
+make example
 ```
 
 Regenerate the documentation via

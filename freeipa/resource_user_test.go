@@ -7,7 +7,9 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	ipa "github.com/lukestanbra/go-freeipa/freeipa"
+
+	// ipa "github.com/lukestanbra/go-freeipa/freeipa"
+	ipa "github.com/ccin2p3/go-freeipa/freeipa"
 )
 
 func TestAccUserBasic(t *testing.T) {

@@ -14,10 +14,22 @@ export FREEIPA_PASSWORD=password
 
 default: install
 
+container:
+	if ! grep ipa.example.test /etc/hosts >/dev/null; then echo "127.0.0.1 ipa.example.test" >> /etc/hosts; fi
+	docker compose up -d
+
+certificate:
+	docker cp freeipa-server:/etc/ipa/ca.crt ./ca.crt
+	sudo security add-trusted-cert -d -r trustRoot -p ssl -k /Library/Keychains/System.keychain ca.crt
+
 build:
+	go mod tidy
+	go get
+	go mod vendor
 	go build -o ${BINARY}
 
 release:
+	go generate
 	goreleaser release --rm-dist --snapshot --skip-publish  --skip-sign
 
 install: build
@@ -25,7 +37,7 @@ install: build
 	mv ${BINARY} ~/.terraform.d/plugins/${HOSTNAME}/${NAMESPACE}/${NAME}/${VERSION}/${OS_ARCH}
 
 test:
-	go test -i $(TEST) || exit 1
+	go test $(TEST) || exit 1
 	echo $(TEST) | xargs -t -n4 go test $(TESTARGS) -timeout=30s -parallel=4
 
 testacc:
